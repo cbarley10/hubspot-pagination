@@ -11,7 +11,7 @@ const fetchData = (url) => {
     const data = response.data;
     data.contacts.forEach((item)=>{
       if(item.properties.cake_preference){
-        if(item.properties.cake_preference.value === "Chocolate"){
+        if(item.properties.cake_preference.value === "vanilla"){
           arr.push(item.properties.cake_preference.value);
         }
       }
