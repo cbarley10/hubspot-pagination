@@ -3,16 +3,18 @@ const axios = require("axios");
 const fs = require("fs");
 const hapikey = process.env.API_KEY;
 
-const contactsUrl = `https://api.hubapi.com/contacts/v1/lists/all/contacts/all?hapikey=${hapikey}&count=100&property=cake_preference`
+const property = "email";
+const object = "contacts";
+const contactsUrl = `https://api.hubapi.com/contacts/v1/lists/all/contacts/all?hapikey=${hapikey}&count=100&property=${property}`;
 const arr = [];
 
 const fetchData = (url) => {
   return axios.get(url).then(response => {
     const data = response.data;
-    data.contacts.forEach((item) => {
-      if(item.properties.cake_preference){
-        if(item.properties.cake_preference.value === "Chocolate"){
-          arr.push(item.properties.cake_preference.value);
+    data[object].forEach((item) => {
+      if(item.properties[property]){
+        if(item.properties[property].value){
+          arr.push(item.properties[property].value);
         }
       }
     });
