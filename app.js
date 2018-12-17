@@ -61,9 +61,9 @@ const fetchData = (fullUrl, questionObj) => {
 
 // wrap the fetchData call in a main() function to fire all events
 const main = async (fullUrl, questionObj) => {
+  start(fullUrl, questionObj);
   await fetchData(fullUrl, questionObj)
   .then(() => {
-    start(fullUrl, questionObj);
     let now = new Date().toString();
     let log = `Time Now: ${now}.\n${questionObj.object.toUpperCase()} with value returned for property "${questionObj.property}": ${arr.length}`
     console.log(arr);
