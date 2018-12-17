@@ -28,17 +28,17 @@ const appendData = (file, logs, array) => {
   });
 }
 
-const fetchData = (fullUrl, object, property, dataOffset, urlOffset) => {
-  return axios.get(fullUrl, object, property, dataOffset, urlOffset)
+const fetchData = (fullUrl, questionObj) => {
+  return axios.get(fullUrl, questionObj)
   .then(response => {
     const data = response.data;
-    loopThroughObjects(data, object, property);
-    const offset = dataOffset;
+    loopThroughObjects(data, questionObj.object, questionObj.property);
+    const offset = questionObj.dataOffset;
     const one = fullUrl.split('&')[0];
     const two = fullUrl.split('&')[1];
     const three = fullUrl.split('&')[2];
-    const newUrl = `${one}&${two}&${three}&${urlOffset}=${data[offset]}`;
-    if (data["has-more"] === true) return fetchData(newUrl, object, property, dataOffset, urlOffset);
+    const newUrl = `${one}&${two}&${three}&${questionObj.urlOffset}=${data[offset]}`;
+    if (data["has-more"] === true) return fetchData(newUrl, questionObj);
     else return data;
   })
   .catch(error => {
@@ -46,12 +46,11 @@ const fetchData = (fullUrl, object, property, dataOffset, urlOffset) => {
   })
 };
 
-const main = async (fullUrl, object, property, dataOffset, urlOffset) => {
-  fetchData(fullUrl, object, property, dataOffset, urlOffset)
+const main = async (fullUrl, questionObj) => {
+  fetchData(fullUrl, questionObj)
   .then(() => {
-    console.log(fullUrl);
     let now = new Date().toString();
-    let log = `Time Now: ${now}. ${object} with value returned for property "${property}": ${arr.length}`
+    let log = `Time Now: ${now}.\n${questionObj.object.toUpperCase()} with value returned for property "${questionObj.property}": ${arr.length}`
     console.log(arr);
     console.log(log);
     appendData("server.log", log, arr);
@@ -63,19 +62,22 @@ const main = async (fullUrl, object, property, dataOffset, urlOffset) => {
 
 
 inquirer.askQuestions.then(answers => {
-  const count = answers[2];
-  const property = answers[1];
-  const url = answers[0][0].uri;
-  const object = answers[0][0].name;
-  const urlOffset= answers[0][0].urlOffset;
-  const dataOffset = answers[0][0].dataOffset;
-  const propertySpelling = answers[0][0].propertySpelling;
-  const fullUrl = `${url}?hapikey=${hapikey}&count=${count}&${propertySpelling}=${property}`;
-  main(fullUrl, object, property, dataOffset, urlOffset)
+  const questionObj = {
+    count: answers[2],
+    property: answers[1],
+    url: answers[0][0].uri,
+    object: answers[0][0].name,
+    urlOffset: answers[0][0].urlOffset,
+    dataOffset: answers[0][0].dataOffset,
+    propertySpelling: answers[0][0].propertySpelling
+  }
+  const fullUrl = `${questionObj.url}?hapikey=${hapikey}&count=${questionObj.count}&${questionObj.propertySpelling}=${questionObj.property}`;
+  main(fullUrl, questionObj)
   .then(() => {
     console.log("STARTING SERVER");
     console.log("===============");
-    console.log(`Getting all ${object}`);
+    console.log(`Getting all ${questionObj.object}`);
+    console.log(fullUrl);
     console.log("===============");
   })
   .catch(err => {
