@@ -1,5 +1,6 @@
 const inquirer = require("inquirer");
 
+// set properties specific to each endpoint
 const endpoints = [
   {
     name: "contacts",
@@ -31,6 +32,7 @@ const endpoints = [
   }
 ];
 
+// set questions to ask in the command line
 const askQuestions = inquirer.prompt([
   {
     message: "Which object would you like to loop through?",
@@ -50,7 +52,9 @@ const askQuestions = inquirer.prompt([
   }
 ])
 .then(answers => {
+  // filter data
   const data = endpoints.filter(endpoint => endpoint.name === answers.endpoint);
+  // return properties we need in app.js
   return [data, answers.props, answers.number];
 }).catch((err) => {
   console.log(err);
