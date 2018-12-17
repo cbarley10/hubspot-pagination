@@ -61,8 +61,9 @@ const fetchData = (fullUrl, questionObj) => {
 
 // wrap the fetchData call in a main() function to fire all events
 const main = async (fullUrl, questionObj) => {
-  fetchData(fullUrl, questionObj)
+  await fetchData(fullUrl, questionObj)
   .then(() => {
+    start(fullUrl, questionObj);
     let now = new Date().toString();
     let log = `Time Now: ${now}.\n${questionObj.object.toUpperCase()} with value returned for property "${questionObj.property}": ${arr.length}`
     console.log(arr);
@@ -72,6 +73,14 @@ const main = async (fullUrl, questionObj) => {
   .catch(error => {
     console.log(error);
   });
+}
+
+const start = (fullUrl, questionObj) => {
+  console.log("STARTING SERVER");
+  console.log("===============");
+  console.log(`Getting all ${questionObj.object}`);
+  console.log(fullUrl);
+  console.log("===============");
 }
 
 // ask questions in commandline
@@ -91,11 +100,8 @@ inquirer.askQuestions.then(answers => {
   // start the program by running the main() function
   main(fullUrl, questionObj)
   .then(() => {
-    console.log("STARTING SERVER");
-    console.log("===============");
-    console.log(`Getting all ${questionObj.object}`);
-    console.log(fullUrl);
-    console.log("===============");
+    console.log("===========")
+    console.log("DONE")
   })
   .catch(error => {
     console.log(error);
