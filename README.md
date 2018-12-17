@@ -1,6 +1,6 @@
 ## Pagination tool for all HubSpot objects written in NodeJS <br>
 
-# Endpoints: <br>
+### Endpoints: <br>
 
 Contacts -  https://developers.hubspot.com/docs/methods/contacts/get_contacts <br>
 Companies - https://developers.hubspot.com/docs/methods/companies/get-all-companies <br>
