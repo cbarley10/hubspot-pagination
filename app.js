@@ -2,8 +2,17 @@
 require("dotenv").config();
 const axios = require("axios");
 const fs = require("fs");
+const Bottleneck = require("bottleneck");
+
+// declare other files and variables
 const hapikey = process.env.API_KEY;
 const inquirer = require("./commandline.js");
+// add secondly rate limiting per request
+const limiter = new Bottleneck({
+  minTime: 999,
+  maxConcurrent: 1
+});
+
 // set empty array
 const arr = [];
 
@@ -62,7 +71,7 @@ const fetchData = (fullUrl, questionObj) => {
 // wrap the fetchData call in a main() function to fire all events
 const main = async (fullUrl, questionObj) => {
   start(fullUrl, questionObj);
-  await fetchData(fullUrl, questionObj)
+  await limiter.schedule(() => fetchData(fullUrl, questionObj))
   .then(() => {
     let now = new Date().toString();
     let log = `Time Now: ${now}.\n${questionObj.object.toUpperCase()} with value returned for property "${questionObj.property}": ${arr.length}`
