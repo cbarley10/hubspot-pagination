@@ -60,8 +60,6 @@ const askQuestions = inquirer.prompt([
   console.log(err);
 });
 
-
-
 module.exports = {
   askQuestions
 };

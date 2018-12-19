@@ -9,8 +9,7 @@ const hapikey = process.env.API_KEY;
 const inquirer = require("./commandline.js");
 // add secondly rate limiting per request
 const limiter = new Bottleneck({
-  minTime: 999,
-  maxConcurrent: 1
+  minTime: 1000
 });
 
 // set empty array
@@ -21,13 +20,11 @@ const arr = [];
 const loopThroughObjects = (data, object, property) => {
   if(object === "tickets") {
     data.objects.forEach(item => {
-      // push to the empty array
       arr.push(item.properties[property].value);
     });
   } else {
     data[object].forEach(item => {
       if(item.properties && item.properties[property]) {
-        // push to the empty array if there's a value
         arr.push(item.properties[property].value);
       }
     });
@@ -46,27 +43,25 @@ const appendData = (file, logs, array) => {
 
 // make the GET to the URL you choose from the command line interface
 // pass through the values from inquirer, and hit the respective endpoint
-const fetchData = (fullUrl, questionObj) => {
-  return axios.get(fullUrl, questionObj)
-  .then(response => {
-    const data = response.data;
-    // loop through the objects passing in the data from the GET, the obejct, and the property
-    loopThroughObjects(data, questionObj.object, questionObj.property);
-    // declare variables to construct newUrl in order to avoid concatenation of offset value instead of replacement
-    const offset = questionObj.dataOffset;
-    const one = fullUrl.split('&')[0];
-    const two = fullUrl.split('&')[1];
-    const three = fullUrl.split('&')[2];
-    const newUrl = `${one}&${two}&${three}&${questionObj.urlOffset}=${data[offset]}`;
-    // if there are more objects to be returned, make another GET with the returned offset value
-    if (data["has-more"] === true) return fetchData(newUrl, questionObj);
-    // make requests until has-more is false
+const fetchData = (fullUrl, { object, property, urlOffset, dataOffset }) => {
+  return axios.get(fullUrl)
+  .then(({ data }) => {
+    loopThroughObjects(data, object, property);
+    const newUrl = createNewUrl(fullUrl, urlOffset, data[dataOffset]);
+    if (data["has-more"] === true) return fetchData(newUrl, { object, property, urlOffset, dataOffset });
     else return data;
   })
   .catch(error => {
     console.log(error);
   })
 };
+
+const createNewUrl = (url, urlOffset, dataOffset) => {
+  const newUrl = new URL(url);
+  newUrl.searchParams.delete(urlOffset);
+  newUrl.searchParams.append(urlOffset, dataOffset);
+  return newUrl.toString();
+}
 
 // wrap the fetchData call in a main() function to fire all events
 const main = async (fullUrl, questionObj) => {
@@ -92,9 +87,13 @@ const start = (fullUrl, questionObj) => {
   console.log("===============");
 }
 
+const end = () => {
+  console.log("===============")
+  console.log("DONE")
+}
+
 // ask questions in commandline
 inquirer.askQuestions.then(answers => {
-  // set object to be used in most later functions
   const questionObj = {
     count: answers[2],
     property: answers[1],
@@ -104,13 +103,10 @@ inquirer.askQuestions.then(answers => {
     dataOffset: answers[0][0].dataOffset,
     propertySpelling: answers[0][0].propertySpelling
   }
-  // build the URL we'll use to make GET requests
   const fullUrl = `${questionObj.url}?hapikey=${hapikey}&count=${questionObj.count}&${questionObj.propertySpelling}=${questionObj.property}`;
-  // start the program by running the main() function
   main(fullUrl, questionObj)
   .then(() => {
-    console.log("===========")
-    console.log("DONE")
+    end();
   })
   .catch(error => {
     console.log(error);
