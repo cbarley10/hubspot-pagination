@@ -9,20 +9,24 @@ const hapikey = process.env.API_KEY;
 const inquirer = require("./commandline.js");
 // add secondly rate limiting per request
 const limiter = new Bottleneck({
-  minTime: 1000
+  minTime: 100
 });
 
 // set empty array
 const arr = [];
 
-// loop through all objects
+// loop push all objects to array
 // pass in data from the GET, the object you're getting, and the property you're looking for
-const loopThroughObjects = (data, object, property) => {
+const pushToArray = (data, object, property) => {
   if(object === "tickets") {
-    data.objects.forEach(item => {
+    // const objectMapped = data.objects.map(item => item.properties[property].value);
+    // console.log(objectMapped);
+    objects.forEach(item => {
       arr.push(item.properties[property].value);
     });
   } else {
+    // const objectMapped = data[object].map(item => item.properties[property].value);
+    // console.log(objectMapped);
     data[object].forEach(item => {
       if(item.properties && item.properties[property]) {
         arr.push(item.properties[property].value);
@@ -46,7 +50,7 @@ const appendData = (file, logs, array) => {
 const fetchData = (fullUrl, { object, property, urlOffset, dataOffset }) => {
   return axios.get(fullUrl)
   .then(({ data }) => {
-    loopThroughObjects(data, object, property);
+    pushToArray(data, object, property);
     const newUrl = createNewUrl(fullUrl, urlOffset, data[dataOffset]);
     if (data["has-more"] === true) return fetchData(newUrl, { object, property, urlOffset, dataOffset });
     else return data;
@@ -65,7 +69,7 @@ const createNewUrl = (url, urlOffset, dataOffset) => {
 
 // wrap the fetchData call in a main() function to fire all events
 const main = async (fullUrl, questionObj) => {
-  start(fullUrl, questionObj);
+  logStartToConsole(fullUrl, questionObj);
   await limiter.schedule(() => fetchData(fullUrl, questionObj))
   .then(() => {
     let now = new Date().toString();
@@ -79,7 +83,7 @@ const main = async (fullUrl, questionObj) => {
   });
 }
 
-const start = (fullUrl, questionObj) => {
+const logStartToConsole = (fullUrl, questionObj) => {
   console.log("STARTING SERVER");
   console.log("===============");
   console.log(`Getting all ${questionObj.object}`);
@@ -87,7 +91,7 @@ const start = (fullUrl, questionObj) => {
   console.log("===============");
 }
 
-const end = () => {
+const logEndToConsole = () => {
   console.log("===============")
   console.log("DONE")
 }
@@ -106,7 +110,7 @@ inquirer.askQuestions.then(answers => {
   const fullUrl = `${questionObj.url}?hapikey=${hapikey}&count=${questionObj.count}&${questionObj.propertySpelling}=${questionObj.property}`;
   main(fullUrl, questionObj)
   .then(() => {
-    end();
+    logEndToConsole();
   })
   .catch(error => {
     console.log(error);
