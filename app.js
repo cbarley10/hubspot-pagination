@@ -21,7 +21,7 @@ const pushToArray = (data, object, property) => {
   if(object === "tickets") {
     // const objectMapped = data.objects.map(item => item.properties[property].value);
     // console.log(objectMapped);
-    objects.forEach(item => {
+    object.forEach(item => {
       arr.push(item.properties[property].value);
     });
   } else {
@@ -68,7 +68,7 @@ const createNewUrl = (url, urlOffset, dataOffset) => {
 }
 
 // wrap the fetchData call in a main() function to fire all events
-const main = async (fullUrl, questionObj) => {
+const main = async(fullUrl, questionObj) => {
   logStartToConsole(fullUrl, questionObj);
   await limiter.schedule(() => fetchData(fullUrl, questionObj))
   .then(() => {
