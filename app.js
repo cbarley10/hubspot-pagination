@@ -21,7 +21,8 @@ const pushToArray = (data, object, property) => {
   if(object === "tickets") {
     // const objectMapped = data.objects.map(item => item.properties[property].value);
     // console.log(objectMapped);
-    object.forEach(item => {
+    console.log(object);
+    data.objects.forEach(item => {
       arr.push(item.properties[property].value);
     });
   } else {
