@@ -21,9 +21,12 @@ const pushToArray = (data, object, property) => {
   if(object === "tickets") {
     // const objectMapped = data.objects.map(item => item.properties[property].value);
     // console.log(objectMapped);
-    console.log(object);
     data.objects.forEach(item => {
       arr.push(item.properties[property].value);
+    });
+  } else if(object === "engagements"){
+    data.results.forEach(item => {
+      arr.push(`${item.engagement.id} - type - ${item.engagement.type} - subject - ${item.metadata.subject}`);
     });
   } else {
     // const objectMapped = data[object].map(item => item.properties[property].value);
@@ -53,7 +56,7 @@ const fetchData = (fullUrl, { object, property, urlOffset, dataOffset }) => {
   .then(({ data }) => {
     pushToArray(data, object, property);
     const newUrl = createNewUrl(fullUrl, urlOffset, data[dataOffset]);
-    if (data["has-more"] === true) return fetchData(newUrl, { object, property, urlOffset, dataOffset });
+    if (data["has-more"] || data.hasMore  === true) return fetchData(newUrl, { object, property, urlOffset, dataOffset });
     else return data;
   })
   .catch(error => {

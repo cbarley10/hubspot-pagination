@@ -29,6 +29,13 @@ const endpoints = [
     urlOffset: "offset",
     dataOffset: "offset",
     propertySpelling: "properties"
+  },
+  {
+    name: "engagements",
+    uri: "https://api.hubapi.com/engagements/v1/engagements/paged",
+    urlOffset: "offset",
+    dataOffset: "offset",
+    propertySpelling: "properties"
   }
 ];
 
@@ -38,7 +45,7 @@ const askQuestions = inquirer.prompt([
     message: "Which object would you like to loop through?",
     type: "rawlist",
     name: "endpoint",
-    choices: ["contacts", "tickets", "companies", "deals"]
+    choices: ["contacts", "tickets", "companies", "deals", "engagements"]
   },
   {
     message: "Which property are you looking for?",
