@@ -40,32 +40,37 @@ const endpoints = [
 ];
 
 // set questions to ask in the command line
-const askQuestions = inquirer.prompt([
-  {
-    message: "Which object would you like to loop through?",
-    type: "rawlist",
-    name: "endpoint",
-    choices: ["contacts", "tickets", "companies", "deals", "engagements"]
-  },
-  {
-    message: "Which property are you looking for?",
-    type: "input",
-    name: "props"
-  },
-  {
-    message: "How many objects would you like to retrieve per call (up to 100)?",
-    type: "input",
-    name: "number",
-  }
-])
-.then(answers => {
-  // filter data
-  const data = endpoints.filter(endpoint => endpoint.name === answers.endpoint);
-  // return properties we need in app.js
-  return [data, answers.props, answers.number];
-}).catch((err) => {
-  console.log(err);
-});
+const askQuestions = inquirer
+  .prompt([
+    {
+      message: "Which object would you like to loop through?",
+      type: "rawlist",
+      name: "endpoint",
+      choices: ["contacts", "tickets", "companies", "deals", "engagements"]
+    },
+    {
+      message: "Which property are you looking for?",
+      type: "input",
+      name: "props"
+    },
+    {
+      message:
+        "How many objects would you like to retrieve per call (up to 100)?",
+      type: "input",
+      name: "number"
+    }
+  ])
+  .then(answers => {
+    // filter data
+    const data = endpoints.filter(
+      endpoint => endpoint.name === answers.endpoint
+    );
+    // return properties we need in app.js
+    return [data, answers.props, answers.number];
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
 module.exports = {
   askQuestions
