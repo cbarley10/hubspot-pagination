@@ -5,7 +5,7 @@ const fs = require("fs");
 const Bottleneck = require("bottleneck");
 
 // declare other files and variables
-const token = process.env.ACCESS_TOKEN;
+const hapikey = process.env.API_KEY;
 const inquirer = require("./commandline.js");
 // add secondly rate limiting per request
 const limiter = new Bottleneck({
@@ -117,7 +117,7 @@ inquirer.askQuestions
       dataOffset: answers[0][0].dataOffset,
       propertySpelling: answers[0][0].propertySpelling
     };
-    const fullUrl = `${questionObj.url}?access_token=${token}&count=${
+    const fullUrl = `${questionObj.url}?hapikey=${hapikey}&count=${
       questionObj.count
     }&${questionObj.propertySpelling}=${questionObj.property}`;
     main(fullUrl, questionObj)
